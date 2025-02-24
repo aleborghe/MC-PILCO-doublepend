@@ -188,7 +188,7 @@ class Double_pend_cost(Expected_cost):
 
     def __init__(self, target_state, lengthscales, angle_index):
         # get the saturated distance function as a function of states and inputs
-        f_cost = lambda x, u, trial_index: cart_pole_cost(
+        f_cost = lambda x, u, trial_index: double_pend_cost(
             x,
             u,
             trial_index,
@@ -206,4 +206,5 @@ def double_pend_cost(states_sequence, inputs_sequence, trial_index, target_state
     theta = states_sequence[:, :, angle_index]
     
     return 1 - torch.exp(-(((torch.abs(theta[0]) - target_state[0]) / lengthscales[0]) ** 2) - ((torch.abs(theta[1]) - target_state[1]) / lengthscales[1]) ** 2)
+
 

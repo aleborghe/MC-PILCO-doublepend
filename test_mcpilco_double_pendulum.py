@@ -148,7 +148,7 @@ control_policy_par["flg_squash"] = True  # Enable squashing input between [-u_ma
 control_policy_par["flg_drop"] = True  # Enable dropout
 policy_reinit_dict = {}  # Parameters for policy re-initialization (in case of NaN cost)
 policy_reinit_dict["lenghtscales_par"] = control_policy_par["lengthscales_init"]
-policy_reinit_dict["centers_par"] = np.array([np.pi, np.pi, np.pi, 1.0, 1.0])
+policy_reinit_dict["centers_par"] = np.array([np.pi, np.pi, 1.0, 1.0, 1.0, 1.0])
 policy_reinit_dict["weight_par"] = u_max
 
 
