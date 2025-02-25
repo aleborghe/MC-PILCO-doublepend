@@ -25,7 +25,7 @@ import policy_learning.Cost_function as Cost_function
 import policy_learning.MC_PILCO as MC_PILCO
 import policy_learning.Policy as Policy
 import simulation_class.ode_systems as f_ode
-
+print(torch.cuda.is_available())
 # Load random seed from command line
 p = argparse.ArgumentParser("test cartpole")
 p.add_argument("-seed", type=int, default=1, help="seed")
@@ -39,11 +39,11 @@ np.random.seed(seed)
 dtype = torch.float64
 
 # Set the device
-device = torch.device("cpu")
-#device=torch.device('cuda')
+#device = torch.device("cpu")
+device=torch.device('cuda:0')
 
 # Set number of computational threads
-num_threads = 4
+num_threads = torch.get_num_threads()
 
 torch.set_num_threads(num_threads)
 
@@ -140,7 +140,7 @@ cos_centers = np.cos(angle_centers)  # ... to initialize cos(theta) centers and 
 sin_centers = np.sin(angle_centers)  # ... sin(theta) centers
 not_angle_centers = np.pi * 2 * (np.random.rand(num_basis, 2) - 0.5)  # Initial centers for [theta_dot1, theta_dot2]
 control_policy_par["centers_init"] = np.concatenate(
-    [not_angle_centers, cos_centers, sin_centers], 1
+    [not_angle_centers, sin_centers, cos_centers], 1
 )  # Aggregate centers
 control_policy_par["lengthscales_init"] = 1 * np.ones(state_dim+2)  # one for each component of policy input
 control_policy_par["weight_init"] = u_max * (np.random.rand(input_dim, num_basis) - 0.5)  # Initial random weights
@@ -157,8 +157,8 @@ print("\n---- Set cost function ----")
 f_cost_function = Cost_function.Double_pend_cost
 # Set the parameters for the selected cost function
 cost_function_par = {}
-#cost_function_par["pos_index"] = 0  # Index of p in the state vector
-cost_function_par["angle_index"] = [0, 1]  # Index of theta in the state vector
+cost_function_par["angle_index"] = 0 # Index of p in the state vector
+cost_function_par["angle2_index"] = 1  # Index of theta in the state vector
 # Targets for theta1 and theta2, respectively
 cost_function_par["target_state"] = torch.tensor([np.pi, 0.0], dtype=dtype, device=device)
 # Cost lengthscales for theta1 and theta2, respectively

@@ -186,7 +186,7 @@ class Double_pend_cost(Expected_cost):
     target is assumed in the instable equilibrium configuration defined in 'target_state' (target angle [rad], target position [m]).
     """
 
-    def __init__(self, target_state, lengthscales, angle_index):
+    def __init__(self, target_state, lengthscales, angle_index, angle2_index):
         # get the saturated distance function as a function of states and inputs
         f_cost = lambda x, u, trial_index: double_pend_cost(
             x,
@@ -195,16 +195,16 @@ class Double_pend_cost(Expected_cost):
             target_state=target_state,
             lengthscales=lengthscales,
             angle_index=angle_index,
+            angle2_index=angle2_index,
         )
         # initit the superclass with the lambda function
         super(Double_pend_cost, self).__init__(f_cost)
 
-def double_pend_cost(states_sequence, inputs_sequence, trial_index, target_state, lengthscales, angle_index):
+def double_pend_cost(states_sequence, inputs_sequence, trial_index, target_state, lengthscales, angle_index, angle2_index):
     """
     Cost function given by the combination of the saturated distance between |theta| and 'target angle', and between x and 'target position'.
     """
-    theta = states_sequence[:, :, angle_index]
-    
-    return 1 - torch.exp(-(((torch.abs(theta[0]) - target_state[0]) / lengthscales[0]) ** 2) - ((torch.abs(theta[1]) - target_state[1]) / lengthscales[1]) ** 2)
+    theta1 = states_sequence[:, :, angle_index]
+    theta2 = states_sequence[:, :, angle2_index]
 
-
+    return 1 - torch.exp(-(((torch.abs(theta1) - target_state[0]) / lengthscales[0]) ** 2) - ((torch.abs(theta2) - target_state[1]) / lengthscales[1]) ** 2)

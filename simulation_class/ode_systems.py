@@ -39,7 +39,7 @@ def cartpole(y, t, u):
     """
 
     x, x_dot, theta, theta_dot = y
-    
+
     m1 = 0.5  # mass of the cart
     m2 = 0.5  # mass of the pendulum
     l = 0.5  # length of the pendulum
@@ -78,7 +78,6 @@ def double_pendulum(y, t, u):
     """
     pos = y[:2]
     vel = y[2:]
-    
 
     I = [0.053470810264216295, 0.02392374528789766]
     Ir = 7.659297952841183e-05
