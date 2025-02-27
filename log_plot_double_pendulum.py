@@ -36,13 +36,13 @@ locals().update(vars(p.parse_known_args()[0]))
 file_name = dir_path + str(seed) + "/log.pkl"
 print("---- Reading log file: " + file_name)
 log_dict = pkl.load(open(file_name, "rb"))
-#particles_states_list = log_dict["particles_states_list"]
-#particles_inputs_list = log_dict["particles_inputs_list"]
-#cost_trial_list = log_dict["cost_trial_list"]
+particles_states_list = log_dict["particles_states_list"]
+particles_inputs_list = log_dict["particles_inputs_list"]
+cost_trial_list = log_dict["cost_trial_list"]
 input_samples_history = log_dict["input_samples_history"]
 noiseless_states_history = log_dict["noiseless_states_history"]
-#num_trials = len(particles_states_list)
-num_trials = 0
+num_trials = len(particles_states_list)
+
 config_log_dict = pkl.load(open(dir_path + str(seed) + "/config_log.pkl", "rb"))
 MC_PILCO_init_dict = config_log_dict["MC_PILCO_init_dict"]
 f_cost_function = MC_PILCO_init_dict["f_cost_function"]
@@ -53,7 +53,7 @@ device = MC_PILCO_init_dict["device"]
 
 
 print("---- Save plots")
-"""
+
 for trial_index in range(0, num_trials):
     state_samples = particles_states_list[trial_index]
     input_samples = particles_inputs_list[trial_index]
@@ -93,7 +93,7 @@ for trial_index in range(0, num_trials):
     plt.plot(np.zeros(len(state_samples[:, :, 0])), "r--")
     plt.savefig(dir_path + str(seed) + "/" + "particles_rollout_trial" + str(trial_index) + ".pdf")
     plt.close()
-"""
+
 trial_index_cost = [0] + list(range(num_trials))
 for trial_index in range(0, num_trials + 1):
     state_samples = noiseless_states_history[trial_index]

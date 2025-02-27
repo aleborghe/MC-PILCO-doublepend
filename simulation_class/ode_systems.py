@@ -78,6 +78,7 @@ def double_pendulum(y, t, u):
     """
     pos = y[:2]
     vel = y[2:]
+    u = np.append(u, 0)
 
     I = [0.053470810264216295, 0.02392374528789766]
     Ir = 7.659297952841183e-05
@@ -88,15 +89,14 @@ def double_pendulum(y, t, u):
     l = [0.3, 0.2]
     m = [0.5593806151425046, 0.6043459469186889]
     com = [0.3, 0.18377686083653508]
-    B = np.eye(2)
-
+    B = np.diag([1, 0])
     #Mass matrix
     m00 = I[0] + I[1] + m[1]*l[0]**2.0 + 2*m[1]*l[0]*com[1]*np.cos(pos[1]) + gr**2.0*Ir + Ir
     m01 = I[1] + m[1]*l[0]*com[1]*np.cos(pos[1]) - gr*Ir
     m10 = I[1] + m[1]*l[0]*com[1]*np.cos(pos[1]) - gr*Ir
     m11 = I[1] + gr**2.0*Ir
     M = np.array([[m00, m01], [m10, m11]])
-    #Coriolis matrix
+
     C00 = -2*m[1]*l[0]*com[1]*np.sin(pos[1])*vel[1]
     C01 = -m[1]*l[0]*com[1]*np.sin(pos[1])*vel[1]
     C10 = m[1]*l[0]*com[1]*np.sin(pos[1])*vel[0]
@@ -113,14 +113,15 @@ def double_pendulum(y, t, u):
 
     Minv = np.linalg.inv(M)
 
-    force = G + B@u.flatten() - C.dot(vel)
+    force = G + B@u - C.dot(vel)
 
     friction = F
 
     accn = Minv.dot(force - friction)
+    #Convert to rad/s
+    alpha1 = accn[0]#/l[0]
+    alpha2 = accn[1]#/l[1]
 
-    alpha1 = accn[0]
-    alpha2 = accn[1]
 
     dydt = [vel[0], vel[1], alpha1, alpha2]
 

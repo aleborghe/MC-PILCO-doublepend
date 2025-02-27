@@ -59,7 +59,6 @@ class Model:
             inputs[i, :] = u
             #u = np.asarray(u).flatten()
             # get state
-            #odeint_out = odeint(self.fcn, states[i, :], [t, t + dt], args=(u[0,0],u[0,1]))
             odeint_out = odeint(self.fcn, states[i, :], [t, t + dt], args=(u,))
             states[i + 1, :] = odeint_out[-1]
             noisy_states[i + 1, :] = odeint_out[1] + np.random.randn(state_dim) * noise

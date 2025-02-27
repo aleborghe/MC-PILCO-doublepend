@@ -25,7 +25,7 @@ import policy_learning.Cost_function as Cost_function
 import policy_learning.MC_PILCO as MC_PILCO
 import policy_learning.Policy as Policy
 import simulation_class.ode_systems as f_ode
-print(torch.cuda.is_available())
+
 # Load random seed from command line
 p = argparse.ArgumentParser("test cartpole")
 p.add_argument("-seed", type=int, default=1, help="seed")
@@ -49,18 +49,19 @@ torch.set_num_threads(num_threads)
 
 print("---- Set environment parameters ----")
 num_trials = 5  # Total trials
-T_sampling = 0.01  # Sampling time
+T_sampling = 0.02  # Sampling time
 T_exploration = 3.0  # Duration of the first exploration trial
 T_control = 3.0  # Duration of each of the following trials during learning
 state_dim = 4  # State dimension
-input_dim = 2  # Input dimension
+input_dim = 1  # Input dimension
 num_gp = int(state_dim / 2)  # Number of Gaussian Processes to learn
-gp_input_dim = 8  # Dimension of the input the Gaussian Process Regression
+gp_input_dim = 7  # Dimension of the input the Gaussian Process Regression
 ode_fun = f_ode.double_pendulum  # Dynamic ODE of the simulated system
 u_max = 10.0  # Input upperbound limit
 std_noise = 10 ** (-2)  # Standard deviation of the measurement noise ...
 std_list = std_noise * np.ones(state_dim)  # ... for all state dimensions
-fl_SOD_GP = True  # Flag to select if to use or not a Subset of Data (SoD) approximation in the GPs
+fl_SOD_GP = False  # Flag to select if to use or not a Subset of Data (SoD) approximation in the GPs
+fl_SOR_GP = True  # Flag to select if to use or not a Subset of Regressors (SoR) approximation in the GPs
 fl_reinforce_init_dist = (
     "Gaussian"  # Initial distribution of the particles in each of the trials. ['Gaussian','Uniform']
 )
@@ -84,6 +85,12 @@ if fl_SOD_GP:
         "SOD_threshold": 0.5,
         "flg_SOD_permutation": False,
     }  # Set SoD threshold
+if fl_SOR_GP:
+    model_learning_par["approximation_mode"] = "SOR"
+    model_learning_par["approximation_dict"] = {
+        "threshold": 0.5*np.ones(num_gp),
+        "flg_regressors_trainable": False,
+    }  # Set SoR threshold
 # Kernel RBF initial parameters
 init_dict_RBF = {}
 init_dict_RBF["active_dims"] = np.arange(0, gp_input_dim)  # Select the GP input components considered inside the kernel
