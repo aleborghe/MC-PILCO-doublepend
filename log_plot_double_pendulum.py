@@ -50,8 +50,6 @@ cost_function_par = MC_PILCO_init_dict["cost_function_par"]
 cost_function = f_cost_function(**cost_function_par)
 dtype = MC_PILCO_init_dict["dtype"]
 device = MC_PILCO_init_dict["device"]
-
-
 print("---- Save plots")
 
 for trial_index in range(0, num_trials):
@@ -62,15 +60,15 @@ for trial_index in range(0, num_trials):
     plt.subplot(4, 1, 1)
     plt.title("particles rollout trial: " + str(trial_index))
     plt.grid()
-    plt.ylabel("$\\theta$")
+    plt.ylabel("$\\theta1$")
     plt.plot(np.pi * np.ones(len(state_samples[:, :, 2])), "r--")
     plt.plot(-np.pi * np.ones(len(state_samples[:, :, 2])), "r--")
-    plt.plot(state_samples[:, :, 2])
+    plt.plot(state_samples[:, :, 0])
     plt.subplot(4, 1, 2)
     plt.grid()
-    plt.ylabel("$x$")
+    plt.ylabel("$\\theta2$")
     plt.plot(np.zeros(len(state_samples[:, :, 0])), "r--")
-    plt.plot(state_samples[:, :, 0])
+    plt.plot(state_samples[:, :, 1])
     plt.subplot(4, 1, 3)
     plt.grid()
     plt.ylabel("$u$")
@@ -149,3 +147,15 @@ plt.ylabel("total rollout cost")
 plt.grid()
 plt.savefig(dir_path + str(seed) + "/" + "learning_plot.pdf")
 plt.close()
+"""
+print("\nLoading policy from: " + file_name)
+log_dict = pkl.load(open(file_name, "rb"))
+trial_index = num_trials - 1
+parameters_policy = log_dict["parameters_trial_list"][trial_index]
+lengthscales = parameters_policy["log_lengthscales"]
+print("Lengthscales: "+ str(lengthscales) +", shape"+ str(lengthscales.shape))
+centers = parameters_policy["centers"]
+print("Centers:"+ str(centers) +", shape"+ str(centers.shape))
+weights = parameters_policy["f_linear.weight"]
+print("Weights: "+ str(weights) +", shape"+ str(weights.shape))
+"""

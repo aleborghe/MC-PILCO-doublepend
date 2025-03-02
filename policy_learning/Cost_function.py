@@ -207,4 +207,5 @@ def double_pend_cost(states_sequence, inputs_sequence, trial_index, target_state
     theta1 = states_sequence[:, :, angle_index]
     theta2 = states_sequence[:, :, angle2_index]
 
-    return 1 - torch.exp(-(((torch.abs(theta1) - target_state[0]) / lengthscales[0]) ** 2) - ((torch.abs(theta2) - target_state[1]) / lengthscales[1]) ** 2)
+    return 1 - torch.exp(-(((theta1 - target_state[0]) / lengthscales[0]) ** 2) - \
+                         ((theta2 - target_state[1]) / lengthscales[1]) ** 2)

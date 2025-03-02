@@ -43,9 +43,9 @@ dtype = torch.float64
 device=torch.device('cuda:0')
 
 # Set number of computational threads
-num_threads = torch.get_num_threads()
+#num_threads = torch.get_num_threads()
 
-torch.set_num_threads(num_threads)
+#torch.set_num_threads(num_threads)
 
 print("---- Set environment parameters ----")
 num_trials = 5  # Total trials
@@ -67,7 +67,7 @@ fl_reinforce_init_dist = (
 )
 
 print("\n---- Set model learning parameters ----")
-f_model_learning = ML.Speed_Model_learning_RBF_MPK_angle_state  # Model function to be trained
+f_model_learning = ML.Speed_Model_learning_RBF_angle_state  # Model function to be trained
 print(f_model_learning)
 model_learning_par = {}
 model_learning_par["num_gp"] = num_gp
@@ -89,7 +89,7 @@ if fl_SOR_GP:
     model_learning_par["approximation_mode"] = "SOR"
     model_learning_par["approximation_dict"] = {
         "threshold": 0.5*np.ones(num_gp),
-        "flg_regressors_trainable": False,
+        "flg_regressors_trainable": True,
     }  # Set SoR threshold
 # Kernel RBF initial parameters
 init_dict_RBF = {}
@@ -104,6 +104,7 @@ init_dict_RBF["sigma_n_num"] = None  # Add fixed noise std for handling numerica
 init_dict_RBF["dtype"] = dtype
 init_dict_RBF["device"] = device
 # Kernel MPK initial parameters
+"""
 init_dict_MPK = {}
 init_dict_MPK["active_dims"] = np.arange(0, gp_input_dim)  # Select the GP input components considered inside the kernel
 init_dict_MPK["poly_deg"] = 2  # Degree of the polynomial kernel
@@ -115,8 +116,9 @@ init_dict_MPK["flg_train_Sigma_pos_par_list"] = [True] * init_dict_MPK["poly_deg
 init_dict_MPK["dtype"] = dtype
 init_dict_MPK["device"] = device
 # Prepare a list of kernels'parameters for each of the GPs (in this case all the GPs have the same parameters)
-model_learning_par["init_dict_list"] = [[init_dict_RBF, init_dict_MPK]] * num_gp
-
+"""
+#model_learning_par["init_dict_list"] = [[init_dict_RBF, init_dict_MPK]] * num_gp
+model_learning_par["init_dict_list"] = [init_dict_RBF] * num_gp
 print("\n---- Set exploration policy parameters ----")
 # Set the exploration policy function
 f_rand_exploration_policy = Policy.Random_exploration
@@ -145,12 +147,12 @@ control_policy_par["device"] = device
 angle_centers = np.pi * 2 * (np.random.rand(num_basis, 2) - 0.5)  # Sample 'num_basis' random angles ...
 cos_centers = np.cos(angle_centers)  # ... to initialize cos(theta) centers and ...
 sin_centers = np.sin(angle_centers)  # ... sin(theta) centers
-not_angle_centers = np.pi * 2 * (np.random.rand(num_basis, 2) - 0.5)  # Initial centers for [theta_dot1, theta_dot2]
+not_angle_centers = np.pi * 4 * (np.random.rand(num_basis, 2) - 0.5)  # Initial centers for [theta_dot1, theta_dot2]
 control_policy_par["centers_init"] = np.concatenate(
     [not_angle_centers, sin_centers, cos_centers], 1
 )  # Aggregate centers
 control_policy_par["lengthscales_init"] = 1 * np.ones(state_dim+2)  # one for each component of policy input
-control_policy_par["weight_init"] = u_max * (np.random.rand(input_dim, num_basis) - 0.5)  # Initial random weights
+control_policy_par["weight_init"] = 2 * u_max * (np.random.rand(input_dim, num_basis) - 0.5)  # Initial random weights
 control_policy_par["flg_squash"] = True  # Enable squashing input between [-u_max, u_max]
 control_policy_par["flg_drop"] = True  # Enable dropout
 policy_reinit_dict = {}  # Parameters for policy re-initialization (in case of NaN cost)
@@ -198,7 +200,7 @@ print("\n---- Set MC-PILCO options ----")
 model_optimization_opt_dict = {}
 model_optimization_opt_dict["f_optimizer"] = "lambda p : torch.optim.Adam(p, lr = 0.01)"  # Specify model optimizer
 model_optimization_opt_dict["criterion"] = Likelihood.Marginal_log_likelihood  # Optimize marginal likelihood
-model_optimization_opt_dict["N_epoch"] = 1001  # Max number of iterations to train the model
+model_optimization_opt_dict["N_epoch"] = 1501  # Max number of iterations to train the model
 model_optimization_opt_dict["N_epoch_print"] = 500  # Frequency of printing to screen partial results
 # Prepare a list for each of the GPs (in this case all the GPs have the same parameters)
 model_optimization_opt_list = [model_optimization_opt_dict] * num_gp
@@ -206,15 +208,15 @@ model_optimization_opt_list = [model_optimization_opt_dict] * num_gp
 policy_optimization_dict = {}
 policy_optimization_dict["num_particles"] = 400  # Number of simulated particles in the Monte-Carlo method
 policy_optimization_dict["opt_steps_list"] = [
+    1500,
     2000,
-    4000,
-    4000,
-    4000,
-    4000,
+    2000,
+    2000,
+    2500,
 ]  # Max number of optimization steps for trial
 policy_optimization_dict["lr_list"] = [0.01, 0.01, 0.01, 0.01, 0.01]  # Initial learning for trial
 policy_optimization_dict["f_optimizer"] = "lambda p, lr : torch.optim.Adam(p, lr)"  # Specify policy optimizer
-policy_optimization_dict["num_step_print"] = 100  # Frequency of printing to screen partial results
+policy_optimization_dict["num_step_print"] = 250  # Frequency of printing to screen partial results
 policy_optimization_dict["p_dropout_list"] = [0.25, 0.25, 0.25, 0.25, 0.25]  # Dropout initial probability for trial
 policy_optimization_dict["p_drop_reduction"] = 0.25 / 2  # Dropout reduction parameter
 policy_optimization_dict["alpha_diff_cost"] = 0.99  # Monitoring signal parameter α_s for early stopping criterion

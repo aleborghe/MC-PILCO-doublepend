@@ -80,13 +80,13 @@ def double_pendulum(y, t, u):
     vel = y[2:]
     u = np.append(u, 0)
 
-    I = [0.053470810264216295, 0.02392374528789766]
+    I = [0.05, 0.02]
     Ir = 7.659297952841183e-05
     b = [0.001, 0.001]
-    coulomb_fric = [0.093, 0.078]
+    coulomb_fric = [0.093, 0.05]
     g = 9.81
     gr = 6.0
-    l = [0.3, 0.2]
+    l = [0.4, 0.1]
     m = [0.5593806151425046, 0.6043459469186889]
     com = [0.3, 0.18377686083653508]
     B = np.diag([1, 0])
@@ -118,10 +118,9 @@ def double_pendulum(y, t, u):
     friction = F
 
     accn = Minv.dot(force - friction)
-    #Convert to rad/s
-    alpha1 = accn[0]#/l[0]
-    alpha2 = accn[1]#/l[1]
 
+    alpha1 = accn[0]
+    alpha2 = accn[1]
 
     dydt = [vel[0], vel[1], alpha1, alpha2]
 
