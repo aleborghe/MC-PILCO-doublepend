@@ -31,7 +31,7 @@ import simulation_class.ode_systems as f_ode
 
 torch.set_num_threads(1)
 dtype = torch.float64
-device = torch.device("cpu")
+device = torch.device("cuda:0")
 
 # define paths
 seed = 1

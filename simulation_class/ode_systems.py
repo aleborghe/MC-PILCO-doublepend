@@ -113,7 +113,7 @@ def double_pendulum(y, t, u):
 
     Minv = np.linalg.inv(M)
 
-    force = G + B@u - C.dot(vel)
+    force = G + B.dot(u) - C.dot(vel)
 
     friction = F
 
