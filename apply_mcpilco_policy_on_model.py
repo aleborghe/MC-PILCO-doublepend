@@ -34,7 +34,7 @@ dtype = torch.float64
 device = torch.device("cuda:0")
 
 # define paths
-seed = 1
+seed = 13
 folder_path = "results_tmp/" + str(seed) + "/"
 config_file_path = folder_path + "/config_log.pkl"
 saving_path = folder_path + "/reproduce_policy_log.pkl"

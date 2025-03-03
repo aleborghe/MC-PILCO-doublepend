@@ -32,7 +32,7 @@ import simulation_class.ode_systems as f_ode
 torch.set_num_threads(1)
 
 # define paths
-seed = 1
+seed = 13
 folder_path = "results_tmp/" + str(seed) + "/"
 config_file_path = folder_path + "/config_log.pkl"
 saving_path = folder_path + "/reproduce_policy_log.pkl"
@@ -41,7 +41,7 @@ saving_path = folder_path + "/reproduce_policy_log.pkl"
 num_test = 50
 
 # select the policy obtained at trial 'num_trial'
-num_trial = 5
+num_trial = 6
 
 # initialize the object
 config_dict = pkl.load(open(config_file_path, "rb"))
