@@ -60,7 +60,7 @@ class Model:
             #u = np.asarray(u).flatten()
             # get state
             odeint_out = odeint(self.fcn, states[i, :], [t, t + dt], args=(u,))
-            states[i + 1, :] = odeint_out[-1]
+            states[i + 1, :] = odeint_out[1]
             noisy_states[i + 1, :] = odeint_out[1] + np.random.randn(state_dim) * noise
 
         # last u (only to have the same number of input and state samples)

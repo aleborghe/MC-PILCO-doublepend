@@ -744,7 +744,11 @@ class MC_PILCO(torch.nn.Module):
         self.model_learning.gp_inputs = log_dict["gp_inputs_" + str(trial_index)]
         self.model_learning.gp_output_list = log_dict["gp_output_list_" + str(trial_index)]
         for k in range(self.model_learning.num_gp):
-            self.model_learning.gp_list[k].load_state_dict(log_dict["parameters_gp_" + str(trial_index)][k])
+            state_dict= log_dict["parameters_gp_" + str(trial_index)][k]
+            U = state_dict.pop("U")
+            self.model_learning.gp_list[k].load_state_dict(state_dict)
+            self.model_learning.gp_list[k].init_inducing_inputs(U)
+            
 
         # pre-train gp models
         for k in range(self.model_learning.num_gp):

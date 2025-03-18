@@ -52,7 +52,7 @@ def condition2(t, x):
     return False
 
 model_par_path = 'pendubot_parameters.yml'
-torque_limit = [10.0, 0.0]
+torque_limit = [6.0, 0.0]
 active_act = 0
 
 mpar = model_parameters(filepath=model_par_path)
@@ -65,7 +65,7 @@ goal = [np.pi, 0.0, 0.0, 0.0]
 plant = SymbolicDoublePendulum(model_pars=mpar)
 sim = Simulator(plant=plant)
 
-controller1 = MCPilcoController(parameters=policy_par, ctrl_rate=1, u_max=10, controlled_dof = 0, wait_steps = 0)
+controller1 = MCPilcoController(parameters=policy_par, ctrl_rate=5, u_max=torque_limit[active_act], controlled_dof = 0, wait_steps = 0)
 
 controller2 = LQRController(model_pars=mpar)
 controller2.set_goal(goal)

@@ -34,7 +34,7 @@ dtype = torch.float64
 device = torch.device("cuda:0")
 
 # define paths
-seed = 13
+seed = 2
 folder_path = "results_tmp/" + str(seed) + "/"
 config_file_path = folder_path + "/config_log.pkl"
 saving_path = folder_path + "/reproduce_policy_log.pkl"
@@ -43,7 +43,7 @@ saving_path = folder_path + "/reproduce_policy_log.pkl"
 num_particles = 50
 
 # select the policy obtained at trial 'num_trial'
-num_trial = 5
+num_trial = 10
 
 # initialize the object
 config_dict = pkl.load(open(config_file_path, "rb"))
@@ -76,25 +76,25 @@ particles_states, particles_inputs = PL_obj.apply_policy(
 )
 
 # pass particles data to numpy
-particles_states = particles_states.detach().numpy()
-particles_inputs = particles_inputs.detach().numpy()
+particles_states = particles_states.cpu().detach().numpy()
+particles_inputs = particles_inputs.cpu().detach().numpy()
 
 
 # plot trajectories
 plt.figure()
 plt.subplot(3, 1, 1)
 plt.grid()
-plt.ylabel("POLE")
+plt.ylabel("Theta1")
 plt.plot(np.pi * np.ones(len(particles_states[:, :, 2])), "r--")
 plt.plot(-np.pi * np.ones(len(particles_states[:, :, 2])), "r--")
 plt.plot(particles_states[:, :, 2])
 plt.subplot(3, 1, 2)
 plt.grid()
-plt.ylabel("CART")
+plt.ylabel("Theta2")
 plt.plot(np.zeros(len(particles_states[:, :, 0])), "r--")
 plt.plot(particles_states[:, :, 0])
 plt.subplot(3, 1, 3)
 plt.grid()
-plt.ylabel("FORCE")
+plt.ylabel("Torque1")
 plt.plot(particles_inputs[:, :, 0])
 plt.show()

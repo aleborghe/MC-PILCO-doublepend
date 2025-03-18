@@ -63,7 +63,7 @@ def get_SOR_GP(exact_GP_object):
             # assign all the variables of the exact_GP_object
             self.__dict__ = exact_GP_object.__dict__
             self.name = "SOR_GP " + self.name
-            # self.U =  torch.nn.Parameter(torch.tensor([],dtype=self.dtype, device=self.device), requires_grad=False)
+            #self.U =  torch.nn.Parameter(torch.tensor([],dtype=self.dtype, device=self.device), requires_grad=False)
 
         def init_inducing_inputs(self, inducing_inputs, flg_train_inducing_inputs=False):
             """

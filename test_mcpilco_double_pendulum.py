@@ -48,20 +48,20 @@ device=torch.device('cuda:0')
 #torch.set_num_threads(num_threads)
 
 print("---- Set environment parameters ----")
-num_trials = 6  # Total trials
+num_trials = 10  # Total trials
 T_sampling = 0.02  # Sampling time
-T_exploration = 3.0  # Duration of the first exploration trial
+T_exploration = 10.0  # Duration of the first exploration trial
 T_control = 3.0  # Duration of each of the following trials during learning
 state_dim = 4  # State dimension
 input_dim = 1  # Input dimension
 num_gp = int(state_dim / 2)  # Number of Gaussian Processes to learn
 gp_input_dim = 7  # Dimension of the input the Gaussian Process Regression
 ode_fun = ode.double_pendulum  # Dynamic ODE of the simulated system
-u_max = 10.0  # Input upperbound limit
+u_max = 6.0  # Input upperbound limit
 std_noise = 10 ** (-2)  # Standard deviation of the measurement noise ...
 std_list = std_noise * np.ones(state_dim)  # ... for all state dimensions
 fl_SOD_GP = False  # Flag to select if to use or not a Subset of Data (SoD) approximation in the GPs
-fl_SOR_GP = False  # Flag to select if to use or not a Subset of Regressors (SoR) approximation in the GPs
+fl_SOR_GP = True  # Flag to select if to use or not a Subset of Regressors (SoR) approximation in the GPs
 fl_reinforce_init_dist = (
     "Gaussian"  # Initial distribution of the particles in each of the trials. ['Gaussian','Uniform']
 )
@@ -89,7 +89,7 @@ if fl_SOR_GP:
     model_learning_par["approximation_mode"] = "SOR"
     model_learning_par["approximation_dict"] = {
         "threshold": 0.5*np.ones(num_gp),
-        "flg_regressors_trainable": True,
+        "flg_regressors_trainable": False,
     }  # Set SoR threshold
 # Kernel RBF initial parameters
 init_dict_RBF = {}
@@ -97,7 +97,7 @@ init_dict_RBF["active_dims"] = np.arange(0, gp_input_dim)  # Select the GP input
 init_dict_RBF["lengthscales_init"] = np.ones(init_dict_RBF["active_dims"].size)  # Initial GP lenghtscales
 init_dict_RBF["flg_train_lengthscales"] = True  # Set GP lengthscales trainable
 init_dict_RBF["lambda_init"] = np.ones(1)  # Initial GP lambda
-init_dict_RBF["flg_train_lambda"] = False  # Set GP lambda trainable
+init_dict_RBF["flg_train_lambda"] = True  # Set GP lambda trainable
 init_dict_RBF["sigma_n_init"] = 1 * np.ones(1)  # Initial GP noise std
 init_dict_RBF["flg_train_sigma_n"] = True  # Set GP noise std trainable
 init_dict_RBF["sigma_n_num"] = None  # Add fixed noise std for handling numerical issues (if necessary)
@@ -131,7 +131,7 @@ rand_exploration_policy_par["dtype"] = dtype
 rand_exploration_policy_par["device"] = device
 
 print("\n---- Set control policy parameters ----")
-num_basis = 200  # Number of Gaussian basis functions
+num_basis = 300  # Number of Gaussian basis functions
 # Set the control policy function
 f_control_policy = Policy.Sum_of_gaussians_with_angles  # policy input: [theta1, theta2, theta_dot, theta_dot2]
 # Set the parameters for the selected policy function
@@ -200,25 +200,29 @@ print("\n---- Set MC-PILCO options ----")
 model_optimization_opt_dict = {}
 model_optimization_opt_dict["f_optimizer"] = "lambda p : torch.optim.Adam(p, lr = 0.01)"  # Specify model optimizer
 model_optimization_opt_dict["criterion"] = Likelihood.Marginal_log_likelihood  # Optimize marginal likelihood
-model_optimization_opt_dict["N_epoch"] = 1501  # Max number of iterations to train the model
+model_optimization_opt_dict["N_epoch"] = 3001  # Max number of iterations to train the model
 model_optimization_opt_dict["N_epoch_print"] = 500  # Frequency of printing to screen partial results
 # Prepare a list for each of the GPs (in this case all the GPs have the same parameters)
 model_optimization_opt_list = [model_optimization_opt_dict] * num_gp
 # Policy optimization options
 policy_optimization_dict = {}
-policy_optimization_dict["num_particles"] = 400  # Number of simulated particles in the Monte-Carlo method
+policy_optimization_dict["num_particles"] = 1000  # Number of simulated particles in the Monte-Carlo method
 policy_optimization_dict["opt_steps_list"] = [
-    1500,
     2000,
     2000,
     2000,
     2000,
-    2500
+    2000,
+    2000,
+    2000,
+    2000,
+    2000,
+    4000
 ]  # Max number of optimization steps for trial
-policy_optimization_dict["lr_list"] = [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]  # Initial learning for trial
+policy_optimization_dict["lr_list"] = 0.01*np.ones(num_trials)  # Initial learning for trial
 policy_optimization_dict["f_optimizer"] = "lambda p, lr : torch.optim.Adam(p, lr)"  # Specify policy optimizer
-policy_optimization_dict["num_step_print"] = 250  # Frequency of printing to screen partial results
-policy_optimization_dict["p_dropout_list"] = [0.25, 0.25, 0.25, 0.25, 0.25, 0.125]  # Dropout initial probability for trial
+policy_optimization_dict["num_step_print"] = 100  # Frequency of printing to screen partial results
+policy_optimization_dict["p_dropout_list"] = 0.25*np.ones(num_trials)  # Dropout initial probability for trial
 policy_optimization_dict["p_drop_reduction"] = 0.25 / 2  # Dropout reduction parameter
 policy_optimization_dict["alpha_diff_cost"] = 0.99  # Monitoring signal parameter α_s for early stopping criterion
 policy_optimization_dict["min_diff_cost"] = 0.08  # Monitoring signal parameter σ_s for early stopping criterion
