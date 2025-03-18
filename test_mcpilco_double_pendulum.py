@@ -48,9 +48,9 @@ device=torch.device('cuda:0')
 #torch.set_num_threads(num_threads)
 
 print("---- Set environment parameters ----")
-num_trials = 10  # Total trials
+num_trials = 5  # Total trials
 T_sampling = 0.02  # Sampling time
-T_exploration = 10.0  # Duration of the first exploration trial
+T_exploration = 3.0  # Duration of the first exploration trial
 T_control = 3.0  # Duration of each of the following trials during learning
 state_dim = 4  # State dimension
 input_dim = 1  # Input dimension
@@ -206,7 +206,7 @@ model_optimization_opt_dict["N_epoch_print"] = 500  # Frequency of printing to s
 model_optimization_opt_list = [model_optimization_opt_dict] * num_gp
 # Policy optimization options
 policy_optimization_dict = {}
-policy_optimization_dict["num_particles"] = 1000  # Number of simulated particles in the Monte-Carlo method
+policy_optimization_dict["num_particles"] = 600  # Number of simulated particles in the Monte-Carlo method
 policy_optimization_dict["opt_steps_list"] = [
     2000,
     2000,
@@ -217,7 +217,7 @@ policy_optimization_dict["opt_steps_list"] = [
     2000,
     2000,
     2000,
-    4000
+    2000
 ]  # Max number of optimization steps for trial
 policy_optimization_dict["lr_list"] = 0.01*np.ones(num_trials)  # Initial learning for trial
 policy_optimization_dict["f_optimizer"] = "lambda p, lr : torch.optim.Adam(p, lr)"  # Specify policy optimizer
