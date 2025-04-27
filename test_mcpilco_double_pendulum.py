@@ -48,7 +48,7 @@ device=torch.device('cuda:0')
 #torch.set_num_threads(num_threads)
 
 print("---- Set environment parameters ----")
-num_trials = 5  # Total trials
+num_trials = 10  # Total trials
 T_sampling = 0.02  # Sampling time
 T_exploration = 3.0  # Duration of the first exploration trial
 T_control = 3.0  # Duration of each of the following trials during learning
@@ -82,7 +82,7 @@ if fl_SOD_GP:
     model_learning_par["approximation_mode"] = "SOD"
     model_learning_par["approximation_dict"] = {
         "SOD_threshold_mode": "relative",
-        "SOD_threshold": 0.5,
+        "SOD_threshold": 0.3,
         "flg_SOD_permutation": False,
     }  # Set SoD threshold
 if fl_SOR_GP:
@@ -200,25 +200,14 @@ print("\n---- Set MC-PILCO options ----")
 model_optimization_opt_dict = {}
 model_optimization_opt_dict["f_optimizer"] = "lambda p : torch.optim.Adam(p, lr = 0.01)"  # Specify model optimizer
 model_optimization_opt_dict["criterion"] = Likelihood.Marginal_log_likelihood  # Optimize marginal likelihood
-model_optimization_opt_dict["N_epoch"] = 3001  # Max number of iterations to train the model
-model_optimization_opt_dict["N_epoch_print"] = 500  # Frequency of printing to screen partial results
+model_optimization_opt_dict["N_epoch"] = 4001  # Max number of iterations to train the model
+model_optimization_opt_dict["N_epoch_print"] = 1000  # Frequency of printing to screen partial results
 # Prepare a list for each of the GPs (in this case all the GPs have the same parameters)
 model_optimization_opt_list = [model_optimization_opt_dict] * num_gp
 # Policy optimization options
 policy_optimization_dict = {}
 policy_optimization_dict["num_particles"] = 600  # Number of simulated particles in the Monte-Carlo method
-policy_optimization_dict["opt_steps_list"] = [
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000
-]  # Max number of optimization steps for trial
+policy_optimization_dict["opt_steps_list"] = [2000] * num_trials  # Max number of optimization steps for trial
 policy_optimization_dict["lr_list"] = 0.01*np.ones(num_trials)  # Initial learning for trial
 policy_optimization_dict["f_optimizer"] = "lambda p, lr : torch.optim.Adam(p, lr)"  # Specify policy optimizer
 policy_optimization_dict["num_step_print"] = 100  # Frequency of printing to screen partial results
